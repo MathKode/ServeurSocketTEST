@@ -18,6 +18,9 @@ if os.name.lower() == "posix":
         output = os.popen('openssl version').read()
         if output.split(' ')[0] in ["LibreSSL", "OpenSSL"]:
             print(" [+] OpenSSL is installed")
+        else:
+            print(f"{red} [-] Error SSL\n     Try 'sudo apt install openssl'")
+            exit(0)
     except:
         print(f"{red} [-] Error SSL\n     Try 'sudo apt install openssl'")
         exit(0)
@@ -28,8 +31,11 @@ elif os.name.lower() == "nt":
         output = os.popen('openssl version').read()
         if output.split(' ')[0] in ["LibreSSL", "OpenSSL"] :
             print(" [+] OpenSSL is installed")
+        else:
+            exit(0)
     except:
-        print(f"{red} [-] Error SSL\n     Try to install Open SLL from 'https://slproweb.com/products/Win32OpenSSL.html' or another site...\n     Then copy that in cmd 'set PATH=%PATH%;C:\Program Files\OpenSSL-Win64\bin\'")
+        c = "$Env:PATH += \";C:\Program Files\OpenSSL-Win64\\bin\\\""
+        print(f"{red} [-] Error SSL\n     Try to install Open SLL from 'https://slproweb.com/products/Win32OpenSSL.html' or another site...\n     If it's installed copy that in cmd 'set PATH=%PATH%;C:\Program Files\OpenSSL-Win64\\bin\'\n     Or this in PowerShell '{c}' and restart the code{reset}")
         exit(0)
 else:
     print("Your OS is not reconize, ERROR can be detected")
@@ -79,10 +85,13 @@ if True:
     try:
         print(f"{green} [+] Repesitory Generation")
         os.mkdir("CA")
-        os.mkdir("CERT")
     except:
         print(f"{red} [-] Error Repesitory Generation (CA & CERT Directory)\n     Create these directories by yourselves if they don't already exist")
     
+    try:
+        os.mkdir("CERT")
+    except:
+        print(f"{red} Error with CERT creation")
     #-----------------------------#
 
     # CA KEY
@@ -136,7 +145,10 @@ if True:
             your_ip_public = ""
         print(f"{reset}     Your current local IP is {orange}{your_ip}{reset}\n          current public IP   {orange}{your_ip_public}")
         _ip_ = str(input(f"     {orange}Enter SERVER IP : {reset}")).split("\n")[0]
-        os.system(f"echo \"subjectAltName=IP:{_ip_}\" > CERT/extfile.cnf")
+        if _os_ == "MAC":
+            os.system(f"echo \"subjectAltName=IP:{_ip_}\" > CERT/extfile.cnf")
+        elif _os_ == "WIN":
+            os.system(f"echo subjectAltName=IP:{_ip_} > CERT/extfile.cnf")
     except:
         print(f"{red} [-] Error CERT SERVER IP extfile \n     Create a extfile.cnf in CERT directory, then write this inside 'subjectAltName=IP:<SERVER_IP>'")
         exit(0)
@@ -162,9 +174,9 @@ if True:
     print("  [+] END SUCCESFULLY")
     
 if _os_ == "MAC":
-    print(f"{blue} LAST STEP ON CLIENT PC\n Now you have to add CA/ca.pem file into your key bundle\n Then click on 'always trust this certificate' and it's done")
+    print(f"{blue} LAST STEP ON CLIENT PC\n Now you have to add CA/ca.pem file into your key bundle\n Then click on 'always trust this certificate' and it's done{reset}")
 elif _os_ == "WIN":
-    print(f"{blue} LAST STEP ON CLIENT PC\n To trust the Certificate Authority (CA), open Administrator PowerShell\n Then copy 'Import-Certificate -FilePath \".CA\ca.pem\" -CertStoreLocation Cert:\LocalMachine\Root'")
+    print(f"{blue} LAST STEP ON CLIENT PC\n To trust the Certificate Authority (CA), open Administrator PowerShell\n Then copy 'Import-Certificate -FilePath \".\CA\ca-cert.pem\" -CertStoreLocation Cert:\LocalMachine\Root'{reset}")
 
     
 

@@ -6,20 +6,36 @@ import os
 
 # Color
 green = "\x1b[32m"
+blue = "\x1b[34m"
 red = "\x1b[31m"
 orange = "\x1b[38;5;220m"
 reset = "\x1b[0m"
 
 if os.name.lower() == "posix":
+    _os_ = "MAC"
     print(f"{green} [+] System Mac OS")
     try:
         output = os.popen('openssl version').read()
-        if output.split(' ')[0] == "LibreSSL":
+        if output.split(' ')[0] in ["LibreSSL", "OpenSSL"]:
             print(" [+] OpenSSL is installed")
     except:
         print(f"{red} [-] Error SSL\n     Try 'sudo apt install openssl'")
         exit(0)
-    
+elif os.name.lower() == "nt":
+    _os_ = "WIN"
+    print(f"{green} [+] System Windows")
+    try:
+        output = os.popen('openssl version').read()
+        if output.split(' ')[0] in ["LibreSSL", "OpenSSL"] :
+            print(" [+] OpenSSL is installed")
+    except:
+        print(f"{red} [-] Error SSL\n     Try to install Open SLL from 'https://slproweb.com/products/Win32OpenSSL.html' or another site...\n     Then copy that in cmd 'set PATH=%PATH%;C:\Program Files\OpenSSL-Win64\bin\'")
+        exit(0)
+else:
+    print("Your OS is not reconize, ERROR can be detected")
+
+#Start Generation
+if True:
     """
     CA = Certificate Authority
         Organisme responsable de signer un certificat
@@ -145,7 +161,10 @@ if os.name.lower() == "posix":
         exit(0)
     print("  [+] END SUCCESFULLY")
     
-    
+if _os_ == "MAC":
+    print(f"{blue} LAST STEP ON CLIENT PC\n Now you have to add CA/ca.pem file into your key bundle\n Then click on 'always trust this certificate' and it's done")
+elif _os_ == "WIN":
+    print(f"{blue} LAST STEP ON CLIENT PC\n To trust the Certificate Authority (CA), open Administrator PowerShell\n Then copy 'Import-Certificate -FilePath \".CA\ca.pem\" -CertStoreLocation Cert:\LocalMachine\Root'")
 
     
 
